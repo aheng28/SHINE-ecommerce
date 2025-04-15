@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SHINE - Online Shopping</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #f7f7f7;
+    }
+    header {
+      background-color: #ff3f6c;
+      color: white;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    nav a {
+      color: white;
+      margin: 0 10px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .hero {
+      background: url('https://images.unsplash.com/photo-1516762689617-e1cffcef479d') no-repeat center center/cover;
+      height: 400px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-size: 36px;
+      font-weight: bold;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+    }
+    .section-title {
+      text-align: center;
+      font-size: 28px;
+      margin: 40px 0 20px;
+      color: #333;
+    }
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 0 40px 40px;
+    }
+    .product {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .product img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+    .btn {
+      display: inline-block;
+      margin: 10px 5px 0;
+      padding: 10px 15px;
+      background-color: #ff3f6c;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background-color: #e1355f;
+    }
+    #cart {
+      background: #fff;
+      padding: 20px;
+      max-width: 600px;
+      margin: 20px auto;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    #cart h3 {
+      margin-top: 0;
+    }
+    .variant-list {
+      margin-top: 10px;
+    }
+    footer {
+      background-color: #333;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+    .login-cart {
+      display: flex;
+      gap: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">SHINE</div>
+    <nav>
+      <a href="#categories">Categories</a>
+      <a href="#cart">Cart</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <div class="login-cart">
+      <form onsubmit="login(event)">
+        <input type="email" id="email" placeholder="Email" required style="padding: 5px; border-radius: 5px; border: none;">
+        <input type="password" id="password" placeholder="Password" required style="padding: 5px; border-radius: 5px; border: none;">
+        <button type="submit" class="btn">Login</button>
+      </form>
+    </div>
+  </header>
+
+  <div class="hero">Welcome to SHINE - Shop the Trend</div>
+
+  <h2 id="categories" class="section-title">Shop by Category</h2>
+  <section class="products" id="product-list"></section>
+
+  <section id="cart">
+    <h3>Your Cart</h3>
+    <div id="cart-items"></div>
+    <h4>Total: ₹<span id="total-cost">0</span></h4>
+    <button class="btn" onclick="checkout()">Proceed to Checkout</button>
+  </section>
+
+  <section class="info-section" id="contact">
+    <h3>Contact Us</h3>
+    <p>Email: <a href="mailto:shine@gmail.com">shine@gmail.com</a></p>
+  </section>
+
+  <footer>&copy; 2025 SHINE. All rights reserved.</footer>
+
+  <script>
+    const products = [
+      {
+        name: "Elegant Kurti",
+        img: "images/kurti.png",
+        variants: [
+          { name: "Red Kurti", price: 699 },
+          { name: "Blue Kurti", price: 749 },
+          { name: "Green Kurti", price: 799 }
+        ]
+      },
+      {
+        name: "Stylish Shoes",
+        img: "images/shoes.png",
+        variants: [
+          { name: "Running Shoes", price: 1299 },
+          { name: "Sneakers", price: 1399 }
+        ]
+      },
+      {
+        name: "Trendy Accessories",
+        img: "images/accessory.png",
+        variants: [
+          { name: "Earrings", price: 299 },
+          { name: "Necklace", price: 499 },
+          { name: "Bracelet", price: 399 }
+        ]
+      },
+      {
+        name: "Chic Tops",
+        img: "images/top.png",
+        variants: [
+          { name: "Floral Top", price: 599 },
+          { name: "Crop Top", price: 549 }
+        ]
+      }
+    ];
+
+    let cart = [];
+
+    function login(event) {
+      event.preventDefault();
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      if (email && password) {
+        alert("Logged in as: " + email);
+      } else {
+        alert("Please enter both email and password.");
+      }
+    }
+
+    function renderProducts() {
+      const container = document.getElementById("product-list");
+      products.forEach((product, index) => {
+        const div = document.createElement("div");
+        div.className = "product";
+        div.innerHTML = `
+          <img src="${product.img}" alt="${product.name}">
+          <h3>${product.name}</h3>
+          <button class="btn" onclick="toggleVariants(${index})">See Variants</button>
+          <div class="variant-list" id="variants-${index}" style="display:none;"></div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function toggleVariants(index) {
+      const variantDiv = document.getElementById(`variants-${index}`);
+      const product = products[index];
+
+      if (variantDiv.innerHTML === "") {
+        product.variants.forEach((v) => {
+          const btn = document.createElement("button");
+          btn.textContent = `${v.name} - ₹${v.price}`;
+          btn.className = "btn";
+          btn.onclick = () => addToCart(v.name, v.price);
+          variantDiv.appendChild(btn);
+        });
+      }
+
+      variantDiv.style.display = variantDiv.style.display === "none" ? "block" : "none";
+    }
+
+    function addToCart(itemName, price) {
+      cart.push({ name: itemName, price });
+      updateCart();
+    }
+
+    function updateCart() {
+      const cartItems = document.getElementById("cart-items");
+      const totalCostEl = document.getElementById("total-cost");
+      cartItems.innerHTML = "";
+      let total = 0;
+
+      cart.forEach((item, i) => {
+        const div = document.createElement("div");
+        div.textContent = `${item.name} - ₹${item.price} `;
+        const btn = document.createElement("button");
+        btn.textContent = "Remove";
+        btn.className = "btn";
+        btn.onclick = () => removeFromCart(i);
+        div.appendChild(btn);
+        cartItems.appendChild(div);
+        total += item.price;
+      });
+
+      totalCostEl.textContent = total;
+    }
+
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      updateCart();
+    }
+
+    function checkout() {
+      if (cart.length === 0) {
+        alert("Your cart is empty.");
+      } else {
+        alert("Proceeding to checkout. Total: ₹" + document.getElementById("total-cost").textContent);
+      }
+    }
+
+    renderProducts();
+  </script>
+</body>
+</html>
